@@ -124,17 +124,17 @@ dmypy.json
 
 # Data files
 *.csv
-*.json
+data/**/*.json
 *.pkl
 *.h5
 *.hdf5
 *.joblib
 *.pickle
 
-# Model files
-models/
-saved_models/
-checkpoints/
+# Trained model files (not source code)
+/models/
+/saved_models/
+/checkpoints/
 
 # IDE
 .vscode/
