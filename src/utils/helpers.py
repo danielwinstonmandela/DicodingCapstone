@@ -30,9 +30,16 @@ def save_config(config_dict, filepath):
         config_dict (dict): Configuration dictionary
         filepath (str): Path to save the JSON file
     """
-    with open(filepath, 'w') as f:
-        json.dump(config_dict, f, indent=4)
-    print(f"Configuration saved to {filepath}")
+    try:
+        with open(filepath, 'w') as f:
+            json.dump(config_dict, f, indent=4)
+        print(f"Configuration saved to {filepath}")
+    except IOError as e:
+        print(f"Error saving configuration to {filepath}: {e}")
+        raise
+    except Exception as e:
+        print(f"Unexpected error saving configuration: {e}")
+        raise
 
 
 def load_config(filepath):
@@ -45,10 +52,20 @@ def load_config(filepath):
     Returns:
         dict: Configuration dictionary
     """
-    with open(filepath, 'r') as f:
-        config = json.load(f)
-    print(f"Configuration loaded from {filepath}")
-    return config
+    try:
+        with open(filepath, 'r') as f:
+            config = json.load(f)
+        print(f"Configuration loaded from {filepath}")
+        return config
+    except FileNotFoundError:
+        print(f"Configuration file not found: {filepath}")
+        raise
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON from {filepath}: {e}")
+        raise
+    except Exception as e:
+        print(f"Unexpected error loading configuration: {e}")
+        raise
 
 
 def plot_confusion_matrix(confusion_matrix, class_names=None, title='Confusion Matrix'):

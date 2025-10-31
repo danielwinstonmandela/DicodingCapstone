@@ -9,6 +9,10 @@ import os
 
 app = Flask(__name__)
 
+# Configure secret key for secure session handling
+# In production, set this via environment variable
+app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+
 # Global variable to store loaded model
 model = None
 
