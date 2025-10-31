@@ -14,7 +14,7 @@ class DataPreprocessor:
     
     def __init__(self):
         self.scaler = StandardScaler()
-        self.label_encoder = LabelEncoder()
+        self.label_encoders = {}  # Dictionary to store encoders for each column
         
     def load_data(self, filepath):
         """
@@ -96,7 +96,9 @@ class DataPreprocessor:
         data_copy = data.copy()
         for col in columns:
             if col in data_copy.columns:
-                data_copy[col] = self.label_encoder.fit_transform(data_copy[col])
+                # Create a new encoder for each column
+                self.label_encoders[col] = LabelEncoder()
+                data_copy[col] = self.label_encoders[col].fit_transform(data_copy[col])
         return data_copy
     
     def split_features_target(self, data, target_column):

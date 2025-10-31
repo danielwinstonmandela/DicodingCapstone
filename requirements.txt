@@ -4,5 +4,5 @@ scikit-learn>=1.0.1
 matplotlib>=3.4.0
 seaborn>=0.11.0
 jupyter>=1.0.0
-flask>=2.3.2
-tensorflow>=2.12.1
+flask>=2.3.3
+tensorflow>=2.13.0
