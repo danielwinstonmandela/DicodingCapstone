@@ -87,8 +87,11 @@ def predict():
             })
     
     except Exception as e:
+        # Log the actual error for debugging (in production, use proper logging)
+        print(f"Prediction error: {e}")
+        # Return generic error message to avoid exposing implementation details
         return jsonify({
-            'error': str(e)
+            'error': 'An error occurred while processing the prediction request'
         }), 500
 
 
