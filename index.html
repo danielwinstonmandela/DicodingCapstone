@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chemical Discovery Agent</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand" role="img" aria-label="Chemical Discovery Agent">
+        <span class="logo">Chemical Discovery Agent</span>
+      </div>
+      <nav class="nav">
+        <button class="nav-link" data-target="home-page">Home</button>
+        <button class="nav-link primary" data-target="portal-page">Launch Portal</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main sections (SPA pages) -->
+  <main id="home-page" class="page active">
+    <section class="hero container">
+      <h1 class="hero-title">Accelerating Chemical Discovery.</h1>
+      <p class="hero-sub">Using Agentic AI to automate R&D, reduce costs, and unlock novel materials faster than ever before.</p>
+      <div class="hero-cta">
+        <button id="hero-launch" class="btn btn-primary">Launch Portal</button>
+      </div>
+    </section>
+
+    <section class="impact container">
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-value">90% Faster</div>
+          <div class="metric-sub">Reduce R&D cycles from months to days.</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">10k+ Candidates</div>
+          <div class="metric-sub">Generate and validate thousands of novel compounds automatically.</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">75% Cost Reduction</div>
+          <div class="metric-sub">Lower laboratory and computational screening costs.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq container">
+      <h2>Frequently asked questions</h2>
+      <div class="accordion">
+        <button class="accordion-toggle">How does the AI work?</button>
+        <div class="accordion-panel">Our system uses a proprietary Agentic AI core that composes multiple models and heuristics to propose, prioritize, and justify candidate molecules.</div>
+
+        <button class="accordion-toggle">Is this data secure?</button>
+        <div class="accordion-panel">All inputs are processed securely and can be configured to stay on-premises for strict security requirements. This prototype simulates secure handling.</div>
+
+        <button class="accordion-toggle">What is the output?</button>
+        <div class="accordion-panel">The agent provides a ranked list of compounds with predicted properties, structure thumbnails, and a short justification for every recommendation.</div>
+      </div>
+    </section>
+  </main>
+
+  <main id="portal-page" class="page">
+    <section class="portal container portal-layout">
+      <aside class="left-column">
+        <div class="panel">
+          <h3>1. Define Criteria</h3>
+          <form id="criteria-form">
+            <div class="field">
+              <label for="bp-range">Boiling Point (°C)</label>
+              <div class="slider-row">
+                <input id="bp-range" class="range" type="range" min="50" max="200" value="100" />
+                <input id="bp-num" class="num" type="number" min="50" max="200" value="100" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="vis-range">Viscosity (cP)</label>
+              <div class="slider-row">
+                <input id="vis-range" class="range" type="range" min="10" max="100" value="45" />
+                <input id="vis-num" class="num" type="number" min="10" max="100" value="45" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="stability">Target Stability</label>
+              <select id="stability">
+                <option>Low</option>
+                <option>Medium</option>
+                <option selected>High</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <button id="generate-btn" class="btn btn-primary large">Generate Compounds</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel history-panel">
+          <h3>2. Session History</h3>
+          <ul id="history-list" class="history-list">
+            <!-- history items injected here -->
+          </ul>
+          <div class="history-note">Runs are saved in your browser (localStorage).</div>
+        </div>
+      </aside>
+
+      <section class="right-column">
+        <div class="panel results-panel">
+          <h3>3. AI-Generated Recommendations</h3>
+          <div id="loader" class="loader" aria-hidden="true">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+
+          <div id="results-container" class="results-container">
+            <p class="muted">No results yet — define criteria and click Generate.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
