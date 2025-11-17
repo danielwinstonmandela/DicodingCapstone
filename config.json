@@ -1,0 +1,29 @@
+{
+    "project": {
+        "name": "Dicoding Capstone Use Case 4",
+        "version": "1.0.0",
+        "description": "Machine Learning Application for Dicoding Capstone"
+    },
+    "data": {
+        "raw_data_path": "data/raw/",
+        "processed_data_path": "data/processed/",
+        "test_size": 0.2,
+        "random_state": 42
+    },
+    "model": {
+        "type": "random_forest",
+        "parameters": {
+            "n_estimators": 100,
+            "random_state": 42
+        }
+    },
+    "preprocessing": {
+        "missing_value_strategy": "mean",
+        "scale_features": true,
+        "encode_categorical": true
+    },
+    "output": {
+        "model_save_path": "models/",
+        "results_save_path": "results/"
+    }
+}
