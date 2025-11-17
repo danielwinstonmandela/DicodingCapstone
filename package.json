@@ -1,0 +1,19 @@
+{
+  "name": "chemical-discovery-agent",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Agentic AI-powered chemical compound discovery platform",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0",
+    "vite-plugin-pwa": "^1.1.0"
+  },
+  "dependencies": {
+    "idb": "^8.0.3"
+  }
+}

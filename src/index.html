@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0a"> 
+    <meta name="description" content="Agentic AI-powered chemical compound discovery platform">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="shortcut icon" href="/favicon.png" />
+    <title>Chemical Discovery Agent</title>
+
+    <script type="module" src="/scripts/index.js"></script>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-to-content">Skip to Content</a>
+    <header>
+      <div class="main-header container">
+        <a class="brand-name" href="#/">Chemical Discovery Agent</a>
+
+        <nav id="navigation-drawer" class="navigation-drawer">
+          <ul id="nav-list" class="nav-list">
+            <li><a href="#/">Home</a></li>
+            <li><a href="#/about">About</a></li>
+            <li class="nav-auth"><a href="#/login">Login</a></li>
+            <li class="nav-auth"><a href="#/register">Register</a></li>
+            <li class="nav-user" style="display: none;"><a href="#/discovery">Discovery Portal</a></li>
+            <li class="nav-user" style="display: none;"><a href="#/history">History</a></li>
+            <li class="nav-user" style="display: none;">
+              <a id="logout-button" href="#">Logout</a>
+            </li>
+          </ul>
+        </nav>
+
+        <button id="drawer-button" class="drawer-button">☰</button>
+      </div>
+    </header>
+
+    <main id="main-content" class="main-content"></main>
+
+    <footer class="main-footer">
+      <div class="container">
+        <p>&copy; 2024 Chemical Discovery Agent. Powered by Agentic AI.</p>
+      </div>
+    </footer>
+  </body>
+</html>
