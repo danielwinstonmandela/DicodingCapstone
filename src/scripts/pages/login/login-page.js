@@ -5,6 +5,7 @@ export default class LoginPage {
     return `
       <section class="container auth-page">
         <div class="auth-card">
+          <div id="auth-loader" class="spinner" style="display: none;"></div>
           <h1>Login</h1>
           <p class="auth-subtitle">Access the Chemical Discovery Portal</p>
           
@@ -44,12 +45,21 @@ export default class LoginPage {
     `;
   }
 
+   showAuthLoader(show = true) {
+    const loader = document.querySelector('#auth-loader');
+    const form = document.querySelector('#register-form');
+    if (!loader || !form) return;
+    loader.style.display = show ? 'block' : 'none';
+    Array.form(form.elements).forEach(el => el.disbled = show);
+  }
+
   async afterRender() {
     const form = document.querySelector('#login-form');
     const errorMessage = document.querySelector('#error-message');
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      this.showAuthLoader(true);
       
       const email = document.querySelector('#email').value;
       const password = document.querySelector('#password').value;
@@ -74,6 +84,8 @@ export default class LoginPage {
         errorMessage.textContent = 'Login failed. Please try again.';
         errorMessage.style.display = 'block';
         console.error('Login error:', error);
+      } finally {
+        this.showAuthLoader(false);
       }
     });
   }

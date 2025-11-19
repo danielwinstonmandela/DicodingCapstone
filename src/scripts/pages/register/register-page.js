@@ -5,6 +5,7 @@ export default class RegisterPage {
     return `
       <section class="container auth-page">
         <div class="auth-card">
+          <div id="auth-loader" class="spinner" style="display: none;"></div>
           <h1>Register</h1>
           <p class="auth-subtitle">Create your researcher account</p>
           
@@ -57,6 +58,14 @@ export default class RegisterPage {
     `;
   }
 
+  showAuthLoader(show = true) {
+    const loader = document.querySelector('#auth-loader');
+    const form = document.querySelector('#register-form');
+    if (!loader || !form) return;
+    loader.style.display = show ? 'block' : 'none';
+    Array.form(form.elements).forEach(el => el.disbled = show);
+  }
+
   async afterRender() {
     const form = document.querySelector('#register-form');
     const errorMessage = document.querySelector('#error-message');
@@ -68,6 +77,7 @@ export default class RegisterPage {
       const name = document.querySelector('#name').value;
       const email = document.querySelector('#email').value;
       const password = document.querySelector('#password').value;
+      this.showAuthLoader(true);
 
       try {
         const response = await registerUser({ name, email, password });
@@ -93,6 +103,8 @@ export default class RegisterPage {
         errorMessage.style.display = 'block';
         successMessage.style.display = 'none';
         console.error('Registration error:', error);
+      } finally {
+        this.showAuthLoader(false);
       }
     });
   }
