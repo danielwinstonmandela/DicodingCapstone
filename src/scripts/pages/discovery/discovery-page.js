@@ -28,7 +28,7 @@ export default class DiscoveryPage {
                   <label for="bp-range">Boiling Point (°C)</label>
                   <div class="slider-row">
                     <input id="bp-range" class="range" type="range" min="50" max="200" value="100" />
-                    <input id="bp-num" class="num" type="number" min="50" max="200" value="100" />
+                    <input id="bp-num" class="num" type="text" value="100" placeholder="50-200" />
                   </div>
                 </div>
 
@@ -36,7 +36,7 @@ export default class DiscoveryPage {
                   <label for="vis-range">Viscosity (cP)</label>
                   <div class="slider-row">
                     <input id="vis-range" class="range" type="range" min="10" max="100" value="45" />
-                    <input id="vis-num" class="num" type="number" min="10" max="100" value="45" />
+                    <input id="vis-num" class="num" type="text" value="45" placeholder="10-100" />
                   </div>
                 </div>
 
@@ -110,20 +110,66 @@ export default class DiscoveryPage {
     const visRange = document.querySelector('#vis-range');
     const visNum = document.querySelector('#vis-num');
 
-    bpRange.addEventListener('input', () => bpNum.value = bpRange.value);
-    bpNum.addEventListener('input', () => {
-      let v = Number(bpNum.value) || 50;
-      v = Math.max(50, Math.min(200, v));
-      bpNum.value = v;
-      bpRange.value = v;
+    // Boiling Point: Sync range to text input
+    bpRange.addEventListener('input', () => {
+      bpNum.value = bpRange.value;
+    });
+    
+    // Boiling Point: Validate and sync on blur (when user finishes typing)
+    bpNum.addEventListener('blur', () => {
+      const val = bpNum.value;
+      
+      if (val === '') {
+        bpNum.value = '100'; // Reset to default if empty
+        bpRange.value = '100';
+        return;
+      }
+      
+      let num = Number(val);
+      
+      if (isNaN(num)) {
+        bpNum.value = '100'; // Reset to default if not a number
+        bpRange.value = '100';
+        return;
+      }
+      
+      // Clamp the value
+      num = Math.max(50, Math.min(200, num));
+      
+      // Update both inputs to clamped value
+      bpNum.value = num;
+      bpRange.value = num;
     });
 
-    visRange.addEventListener('input', () => visNum.value = visRange.value);
-    visNum.addEventListener('input', () => {
-      let v = Number(visNum.value) || 10;
-      v = Math.max(10, Math.min(100, v));
-      visNum.value = v;
-      visRange.value = v;
+    // Viscosity: Sync range to text input
+    visRange.addEventListener('input', () => {
+      visNum.value = visRange.value;
+    });
+    
+    // Viscosity: Validate and sync on blur (when user finishes typing)
+    visNum.addEventListener('blur', () => {
+      const val = visNum.value;
+      
+      if (val === '') {
+        visNum.value = '45'; // Reset to default if empty
+        visRange.value = '45';
+        return;
+      }
+      
+      let num = Number(val);
+      
+      if (isNaN(num)) {
+        visNum.value = '45'; // Reset to default if not a number
+        visRange.value = '45';
+        return;
+      }
+      
+      // Clamp the value
+      num = Math.max(10, Math.min(100, num));
+      
+      // Update both inputs to clamped value
+      visNum.value = num;
+      visRange.value = num;
     });
   }
 
