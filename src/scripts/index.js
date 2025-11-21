@@ -2,6 +2,7 @@ import '../styles/styles.css';
 
 import App from './pages/app';
 import { deleteAuthToken } from './data/idb-helper';
+import { requestNotificationPermission } from './data/api';
 
 /**
  * Setup navigation based on login status
@@ -53,6 +54,14 @@ const app = new App({
 // Setup navigation
 setupNavigation();
 
+// Request notification permission on app load (non-blocking)
+window.addEventListener('load', () => {
+  // Attempt to request notification permission
+  requestNotificationPermission().catch((error) => {
+    console.log('Notification permission request failed:', error);
+  });
+});
+
 // Initial render
 window.addEventListener('DOMContentLoaded', async () => {
   await app.renderPage();
@@ -67,12 +76,13 @@ window.addEventListener('hashchange', async () => {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js')
+      .register('./sw.js', { scope: '/' })
       .then((registration) => {
         console.log('SW registered:', registration);
       })
       .catch((error) => {
         console.log('SW registration failed:', error);
+        // Service worker errors are non-critical, app will still work
       });
   });
 }

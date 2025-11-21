@@ -33,7 +33,8 @@ export default class LoginPage {
 
             <div id="error-message" class="error-message" style="display: none;"></div>
 
-            <button type="submit" class="btn btn-primary large">Login</button>
+            <button type="submit" class="btn btn-primary large" id="login-button">Login</button>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
           </form>
 
           <p class="auth-footer">
@@ -47,6 +48,8 @@ export default class LoginPage {
   async afterRender() {
     const form = document.querySelector('#login-form');
     const errorMessage = document.querySelector('#error-message');
+    const submitButton = document.querySelector('#login-button');
+    const spinner = document.querySelector('#loading-spinner');
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -54,12 +57,22 @@ export default class LoginPage {
       const email = document.querySelector('#email').value;
       const password = document.querySelector('#password').value;
 
+      // Show spinner and disable button
+      spinner.style.display = 'block';
+      submitButton.disabled = true;
+      submitButton.style.opacity = '0.5';
+
       try {
         const response = await loginUser({ email, password });
         
         if (response.error) {
           errorMessage.textContent = response.message;
           errorMessage.style.display = 'block';
+          
+          // Hide spinner and re-enable button
+          spinner.style.display = 'none';
+          submitButton.disabled = false;
+          submitButton.style.opacity = '1';
           return;
         }
 
@@ -74,6 +87,11 @@ export default class LoginPage {
         errorMessage.textContent = 'Login failed. Please try again.';
         errorMessage.style.display = 'block';
         console.error('Login error:', error);
+        
+        // Hide spinner and re-enable button
+        spinner.style.display = 'none';
+        submitButton.disabled = false;
+        submitButton.style.opacity = '1';
       }
     });
   }
