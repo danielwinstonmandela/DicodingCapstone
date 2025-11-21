@@ -3,55 +3,64 @@ import { loginUser } from '../../data/api';
 export default class LoginPage {
   async render() {
     return `
-      <section class="container auth-page">
+      <div class="auth-container">
         <div class="auth-card">
-          <div id="auth-loader" class="spinner" style="display: none;"></div>
           <h1>Login</h1>
           <p class="auth-subtitle">Access the Chemical Discovery Portal</p>
           
-          <form id="login-form" class="auth-form">
-            <div class="field">
+          <form id="login-form">
+            <div class="form-group">
               <label for="email">Email</label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                required 
-                placeholder="researcher@example.com"
-              />
+              <input type="email" id="email" required />
             </div>
-
-            <div class="field">
+            
+            <div class="form-group">
               <label for="password">Password</label>
-              <input 
-                type="password" 
-                id="password" 
-                name="password" 
-                required 
-                placeholder="Enter your password"
-              />
+              <input type="password" id="password" required />
             </div>
-
+            
             <div id="error-message" class="error-message" style="display: none;"></div>
-
-            <button type="submit" class="btn btn-primary large">Login</button>
+            
+            <button type="submit" class="btn-primary">Login</button>
           </form>
-
+          
           <p class="auth-footer">
             Don't have an account? <a href="#/register">Register here</a>
           </p>
         </div>
-      </section>
+      </div>
     `;
   }
 
-   showAuthLoader(show = true) {
-    const loader = document.querySelector('#auth-loader');
-    const form = document.querySelector('#register-form');
-    if (!loader || !form) return;
-    loader.style.display = show ? 'block' : 'none';
-    Array.form(form.elements).forEach(el => el.disbled = show);
+showAuthLoader(show = true) {
+  if (show) {
+    const oldLoader = document.getElementById('fullscreen-loader');
+    if (oldLoader) oldLoader.remove();
+    
+    // Create new loader
+    const loader = document.createElement('div');
+    loader.id = 'fullscreen-loader';
+    loader.innerHTML = '<div class="spinner"></div>';
+    document.body.appendChild(loader);
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+
+    const form = document.querySelector('#login-form');
+    if (form) {
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.textContent = 'Logging in...';
+    }
+  } else {
+    const loader = document.getElementById('fullscreen-loader');
+    if (loader) loader.remove();
+    document.body.style.overflow = ''; // Restore scrolling
+
+    const form = document.querySelector('#login-form');
+    if (form) {
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.textContent = 'Login';
+    }
   }
+}
 
   async afterRender() {
     const form = document.querySelector('#login-form');
@@ -60,7 +69,7 @@ export default class LoginPage {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       this.showAuthLoader(true);
-      
+
       const email = document.querySelector('#email').value;
       const password = document.querySelector('#password').value;
 
@@ -70,6 +79,7 @@ export default class LoginPage {
         if (response.error) {
           errorMessage.textContent = response.message;
           errorMessage.style.display = 'block';
+          this.showAuthLoader(false);
           return;
         }
 
@@ -79,12 +89,11 @@ export default class LoginPage {
 
         // Redirect to discovery page
         window.location.hash = '#/discovery';
-        window.location.reload(); // Reload to update navigation
+        window.location.reload();
       } catch (error) {
         errorMessage.textContent = 'Login failed. Please try again.';
         errorMessage.style.display = 'block';
         console.error('Login error:', error);
-      } finally {
         this.showAuthLoader(false);
       }
     });

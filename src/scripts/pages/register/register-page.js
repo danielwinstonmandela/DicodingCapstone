@@ -61,9 +61,13 @@ export default class RegisterPage {
   showAuthLoader(show = true) {
     const loader = document.querySelector('#auth-loader');
     const form = document.querySelector('#register-form');
-    if (!loader || !form) return;
-    loader.style.display = show ? 'block' : 'none';
-    Array.form(form.elements).forEach(el => el.disbled = show);
+    if (show) {
+      loader.style.display = 'block';
+      Array.from(form.elements).forEach(el => el.disabled = true);
+    } else{
+      loader.style.display = 'none';
+      Array.from(form.elements).forEach(el => el.disabled = false);
+    }
   }
 
   async afterRender() {
