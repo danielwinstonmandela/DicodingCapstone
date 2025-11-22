@@ -6,14 +6,18 @@ export default class DiscoveryPage {
   #userName = null;
 
   constructor() {
+    // Constructor should not perform auth checks
+    // Auth is checked in render() method
+  }
+
+  async render() {
+    // Check authentication when rendering
     this.#authToken = sessionStorage.getItem('authToken');
     this.#userName = sessionStorage.getItem('userName');
     if (!this.#authToken) {
       location.hash = '#/login';
+      return '';
     }
-  }
-
-  async render() {
     return `
       <section class="container portal-layout">
         <h1>Chemical Discovery Portal</h1>

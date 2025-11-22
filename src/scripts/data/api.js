@@ -221,6 +221,68 @@ function generateMockCompound(index, criteria) {
   };
 }
 
+// Groq AI integration for generating justifications (FREE!)
+export async function generateJustificationWithAI(compound, criteria) {
+  try {
+    const prompt = `You are a chemical research AI assistant. Generate a concise, scientific justification (2-3 sentences) for why this chemical compound is suitable based on the given criteria.
+
+Compound: ${compound.name}
+Formula: ${compound.formula}
+Properties:
+- Dipole Moment (μ): ${compound.mu} Debye
+- Polarizability (α): ${compound.alpha} Ų
+- HOMO-LUMO Gap: ${compound.gap} eV
+- Heat Capacity (Cv): ${compound.cv} cal/mol·K
+
+Target Criteria:
+- Target Dipole Moment (μ): ${criteria.mu} Debye
+- Target Polarizability (α): ${criteria.alpha} Ų
+- Target HOMO-LUMO Gap: ${criteria.gap} eV
+- Target Heat Capacity (Cv): ${criteria.cv} cal/mol·K
+
+Provide a brief scientific justification explaining why this compound matches or is suitable for the specified quantum chemical criteria.`;
+
+    const response = await fetch(CONFIG.GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CONFIG.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: CONFIG.GROQ_MODEL,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 200,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Groq API error details:', errorData);
+      throw new Error(`Groq API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    
+    // Extract the generated text from Groq response
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      return data.choices[0].message.content.trim();
+    }
+    
+    // Fallback to a default justification if response format is unexpected
+    return 'This compound exhibits favorable quantum chemical properties that align well with the specified criteria.';
+  } catch (error) {
+    console.error('Error generating justification with AI:', error);
+    // Return a fallback justification if API call fails
+    return 'This compound demonstrates optimal balance between the specified quantum properties, making it suitable for your requirements.';
+  }
+}
+
 // User authentication functions (using real API)
 export async function registerUser({ name, email, password }) {
   try {
@@ -265,8 +327,24 @@ export async function generateCompounds(token, criteria) {
     compounds.push(generateMockCompound(i, criteria));
   }
 
-  // Sort by score descending
-  compounds.sort((a, b) => b.score - a.score);
+  // Generate AI justifications for each compound using Groq (FREE!)
+  console.log('Generating AI justifications with Groq...');
+  const justificationPromises = compounds.map(compound => 
+    generateJustificationWithAI(compound, criteria)
+  );
+  
+  // Wait for all justifications to be generated
+  const justifications = await Promise.all(justificationPromises);
+  
+  // Assign the generated justifications to compounds
+  compounds.forEach((compound, index) => {
+    compound.justification = justifications[index];
+  });
+
+  // Sort by score descending (if score exists)
+  if (compounds[0]?.score !== undefined) {
+    compounds.sort((a, b) => b.score - a.score);
+  }
 
   // Send notification when discovery is complete
   console.log('Attempting to send notification...');
