@@ -47,7 +47,8 @@ export default class RegisterPage {
             <div id="error-message" class="error-message" style="display: none;"></div>
             <div id="success-message" class="success-message" style="display: none;"></div>
 
-            <button type="submit" class="btn btn-primary large">Register</button>
+            <button type="submit" class="btn btn-primary large" id="register-button">Register</button>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
           </form>
 
           <p class="auth-footer">
@@ -74,6 +75,8 @@ export default class RegisterPage {
     const form = document.querySelector('#register-form');
     const errorMessage = document.querySelector('#error-message');
     const successMessage = document.querySelector('#success-message');
+    const submitButton = document.querySelector('#register-button');
+    const spinner = document.querySelector('#loading-spinner');
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -81,7 +84,11 @@ export default class RegisterPage {
       const name = document.querySelector('#name').value;
       const email = document.querySelector('#email').value;
       const password = document.querySelector('#password').value;
-      this.showAuthLoader(true);
+
+      // Show spinner and disable button
+      spinner.style.display = 'block';
+      submitButton.disabled = true;
+      submitButton.style.opacity = '0.5';
 
       try {
         const response = await registerUser({ name, email, password });
@@ -90,6 +97,11 @@ export default class RegisterPage {
           errorMessage.textContent = response.message;
           errorMessage.style.display = 'block';
           successMessage.style.display = 'none';
+          
+          // Hide spinner and re-enable button
+          spinner.style.display = 'none';
+          submitButton.disabled = false;
+          submitButton.style.opacity = '1';
           return;
         }
 
@@ -98,6 +110,7 @@ export default class RegisterPage {
         successMessage.style.display = 'block';
         errorMessage.style.display = 'none';
 
+        // Keep spinner visible during redirect
         // Redirect to login after 2 seconds
         setTimeout(() => {
           window.location.hash = '#/login';
@@ -107,8 +120,6 @@ export default class RegisterPage {
         errorMessage.style.display = 'block';
         successMessage.style.display = 'none';
         console.error('Registration error:', error);
-      } finally {
-        this.showAuthLoader(false);
       }
     });
   }

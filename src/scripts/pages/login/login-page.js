@@ -20,8 +20,9 @@ export default class LoginPage {
             </div>
             
             <div id="error-message" class="error-message" style="display: none;"></div>
-            
-            <button type="submit" class="btn-primary">Login</button>
+
+            <button type="submit" class="btn btn-primary large" id="login-button">Login</button>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
           </form>
           
           <p class="auth-footer">
@@ -65,6 +66,8 @@ showAuthLoader(show = true) {
   async afterRender() {
     const form = document.querySelector('#login-form');
     const errorMessage = document.querySelector('#error-message');
+    const submitButton = document.querySelector('#login-button');
+    const spinner = document.querySelector('#loading-spinner');
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -73,13 +76,17 @@ showAuthLoader(show = true) {
       const email = document.querySelector('#email').value;
       const password = document.querySelector('#password').value;
 
+      // Show spinner and disable button
+      spinner.style.display = 'block';
+      submitButton.disabled = true;
+      submitButton.style.opacity = '0.5';
+
       try {
         const response = await loginUser({ email, password });
         
         if (response.error) {
           errorMessage.textContent = response.message;
           errorMessage.style.display = 'block';
-          this.showAuthLoader(false);
           return;
         }
 
@@ -94,7 +101,6 @@ showAuthLoader(show = true) {
         errorMessage.textContent = 'Login failed. Please try again.';
         errorMessage.style.display = 'block';
         console.error('Login error:', error);
-        this.showAuthLoader(false);
       }
     });
   }

@@ -1,4 +1,4 @@
-import { generateCompounds } from '../../data/api';
+import { generateCompounds, requestNotificationPermission } from '../../data/api';
 import { saveDiscoveryRun } from '../../data/idb-helper';
 
 export default class DiscoveryPage {
@@ -6,14 +6,18 @@ export default class DiscoveryPage {
   #userName = null;
 
   constructor() {
+    // Constructor should not perform auth checks
+    // Auth is checked in render() method
+  }
+
+  async render() {
+    // Check authentication when rendering
     this.#authToken = sessionStorage.getItem('authToken');
     this.#userName = sessionStorage.getItem('userName');
     if (!this.#authToken) {
       location.hash = '#/login';
+      return '';
     }
-  }
-
-  async render() {
     return `
       <section class="container portal-layout">
         <h1>Chemical Discovery Portal</h1>
@@ -22,40 +26,67 @@ export default class DiscoveryPage {
         <div class="portal-grid">
           <aside class="criteria-panel">
             <div class="panel">
-              <h3>Define Criteria</h3>
+              <h3>Define Quantum Criteria</h3>
+              <p class="criteria-instructions">Enter the quantum chemical properties you're looking for. All fields support decimal values.</p>
+              
               <form id="criteria-form">
                 <div class="field">
-                  <label for="bp-range">Boiling Point (°C)</label>
-                  <div class="slider-row">
-                    <input id="bp-range" class="range" type="range" min="50" max="200" value="100" />
-                    <input id="bp-num" class="num" type="number" min="50" max="200" value="100" />
-                  </div>
+                  <label for="mu">Dipole Moment (μ)</label>
+                  <span class="field-hint">Range: 0.5 - 5.0 Debye</span>
+                  <input 
+                    id="mu" 
+                    type="number" 
+                    value="2.5" 
+                    placeholder="Enter dipole moment"
+                    step="0.01"
+                  />
                 </div>
 
                 <div class="field">
-                  <label for="vis-range">Viscosity (cP)</label>
-                  <div class="slider-row">
-                    <input id="vis-range" class="range" type="range" min="10" max="100" value="45" />
-                    <input id="vis-num" class="num" type="number" min="10" max="100" value="45" />
-                  </div>
+                  <label for="alpha">Polarizability (α)</label>
+                  <span class="field-hint">Range: 50.0 - 90.0 Ų</span>
+                  <input 
+                    id="alpha" 
+                    type="number" 
+                    value="70.0" 
+                    placeholder="Enter polarizability"
+                    step="0.01"
+                  />
                 </div>
 
                 <div class="field">
-                  <label for="stability">Target Stability</label>
-                  <select id="stability">
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option selected>High</option>
-                  </select>
+                  <label for="gap">HOMO–LUMO Gap</label>
+                  <span class="field-hint">Range: 0.1 - 10.0 eV</span>
+                  <input 
+                    id="gap" 
+                    type="number" 
+                    value="5.0" 
+                    placeholder="Enter HOMO-LUMO gap"
+                    step="0.01"
+                  />
                 </div>
 
                 <div class="field">
-                  <label for="solubility">Solubility Requirement</label>
-                  <select id="solubility">
-                    <option>Water-soluble</option>
-                    <option selected>Organic-soluble</option>
-                    <option>Both</option>
-                  </select>
+                  <label for="cv">Heat Capacity (Cv)</label>
+                  <span class="field-hint">Range: 20.0 - 40.0 cal/mol·K</span>
+                  <input 
+                    id="cv" 
+                    type="number" 
+                    value="30.0" 
+                    placeholder="Enter heat capacity"
+                    step="0.01"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="num_atoms">Number of Atoms (Optional)</label>
+                  <span class="field-hint">Integer only, no limit</span>
+                  <input 
+                    id="num_atoms" 
+                    type="number" 
+                    placeholder="Enter number of atoms"
+                    step="1"
+                  />
                 </div>
 
                 <div class="field">
@@ -100,31 +131,21 @@ export default class DiscoveryPage {
   async afterRender() {
     if (!this.#authToken) return;
 
+    // Request notification permission when user accesses discovery page
+    try {
+      await requestNotificationPermission();
+      console.log('Notification permission status:', Notification.permission);
+    } catch (error) {
+      console.log('Could not request notification permission:', error);
+    }
+
     this.#setupFormControls();
     this.#setupFormSubmit();
   }
 
   #setupFormControls() {
-    const bpRange = document.querySelector('#bp-range');
-    const bpNum = document.querySelector('#bp-num');
-    const visRange = document.querySelector('#vis-range');
-    const visNum = document.querySelector('#vis-num');
-
-    bpRange.addEventListener('input', () => bpNum.value = bpRange.value);
-    bpNum.addEventListener('input', () => {
-      let v = Number(bpNum.value) || 50;
-      v = Math.max(50, Math.min(200, v));
-      bpNum.value = v;
-      bpRange.value = v;
-    });
-
-    visRange.addEventListener('input', () => visNum.value = visRange.value);
-    visNum.addEventListener('input', () => {
-      let v = Number(visNum.value) || 10;
-      v = Math.max(10, Math.min(100, v));
-      visNum.value = v;
-      visRange.value = v;
-    });
+    // No special controls needed for simple number inputs
+    // HTML5 number inputs handle validation natively
   }
 
   #setupFormSubmit() {
@@ -133,11 +154,14 @@ export default class DiscoveryPage {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       
+      const numAtomsValue = document.querySelector('#num_atoms').value;
+      
       const criteria = {
-        boilingPoint: Number(document.querySelector('#bp-num').value),
-        viscosity: Number(document.querySelector('#vis-num').value),
-        stability: document.querySelector('#stability').value,
-        solubility: document.querySelector('#solubility').value,
+        mu: parseFloat(document.querySelector('#mu').value),
+        alpha: parseFloat(document.querySelector('#alpha').value),
+        gap: parseFloat(document.querySelector('#gap').value),
+        cv: parseFloat(document.querySelector('#cv').value),
+        num_atoms: numAtomsValue ? parseInt(numAtomsValue, 10) : null,
       };
 
       await this.#runDiscovery(criteria);
@@ -199,20 +223,20 @@ export default class DiscoveryPage {
             <h3>${compound.name}</h3>
             <div class="compound-properties">
               <div class="property">
-                <span class="property-label">Score:</span>
-                <span class="property-value">${compound.score}/100</span>
+                <span class="property-label">Dipole Moment (μ):</span>
+                <span class="property-value">${compound.mu.toFixed(2)}</span>
               </div>
               <div class="property">
-                <span class="property-label">Stability:</span>
-                <span class="property-value">${compound.stability}</span>
+                <span class="property-label">Polarizability (α):</span>
+                <span class="property-value">${compound.alpha.toFixed(2)}</span>
               </div>
               <div class="property">
-                <span class="property-label">Solubility:</span>
-                <span class="property-value">${compound.solubility}</span>
+                <span class="property-label">HOMO–LUMO Gap:</span>
+                <span class="property-value">${compound.gap.toFixed(2)}</span>
               </div>
               <div class="property">
-                <span class="property-label">Synthesis:</span>
-                <span class="property-value">${compound.synthesisComplexity}</span>
+                <span class="property-label">Heat Capacity (Cv):</span>
+                <span class="property-value">${compound.cv.toFixed(2)}</span>
               </div>
             </div>
             <div class="compound-justification">

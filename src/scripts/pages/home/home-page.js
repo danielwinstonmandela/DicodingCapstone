@@ -43,6 +43,18 @@ export default class HomePage {
   }
 
   async afterRender() {
+    // Setup Discovery Portal button with authentication guard
+    const discoveryButton = document.querySelector('.hero-cta a[href="#/discovery"]');
+    if (discoveryButton) {
+      discoveryButton.addEventListener('click', (event) => {
+        const authToken = sessionStorage.getItem('authToken');
+        if (!authToken) {
+          event.preventDefault();
+          window.location.hash = '#/login';
+        }
+      });
+    }
+
     // Accordion functionality
     const accordionToggles = document.querySelectorAll('.accordion-toggle');
     accordionToggles.forEach((toggle) => {

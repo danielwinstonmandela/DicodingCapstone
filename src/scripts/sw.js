@@ -64,3 +64,38 @@ self.addEventListener('activate', (event) => {
     })
   );
 });
+
+// Handle messages from the main thread
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    const { title, options } = event.data;
+    self.registration.showNotification(title, options);
+  }
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  // Focus the app window or open it
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then((windowClients) => {
+      // Check if there's already a window/tab with the target URL open
+      for (let i = 0; i < windowClients.length; i++) {
+        const client = windowClients[i];
+        if (client.url === '/' && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // If not, open a new window/tab with the target URL
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
+  );
+});
+
+// Handle notification close
+self.addEventListener('notificationclose', (event) => {
+  console.log('Notification closed:', event.notification.tag);
+});

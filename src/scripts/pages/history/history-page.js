@@ -5,13 +5,17 @@ export default class HistoryPage {
   #runs = [];
 
   constructor() {
-    this.#authToken = sessionStorage.getItem('authToken');
-    if (!this.#authToken) {
-      location.hash = '#/login';
-    }
+    // Constructor should not perform auth checks
+    // Auth is checked in render() method
   }
 
   async render() {
+    // Check authentication when rendering
+    this.#authToken = sessionStorage.getItem('authToken');
+    if (!this.#authToken) {
+      location.hash = '#/login';
+      return '';
+    }
     return `
       <section class="container history-page">
         <h1>Discovery History</h1>
