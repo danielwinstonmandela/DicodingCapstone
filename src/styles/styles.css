@@ -724,6 +724,21 @@ select:focus {
   to { transform: rotate(360deg); }
 }
 
+.smiles-notation {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  background: #f0f0f0;
+  padding: 8px;
+  border-radius: 4px;
+  word-break: break-all;
+  margin-bottom: 8px;
+}
+
+.atom-count {
+  font-size: 0.8em;
+  color: #666;
+  font-style: italic;
+}
 .agent-status {
   margin-top: 32px;
   text-align: left;

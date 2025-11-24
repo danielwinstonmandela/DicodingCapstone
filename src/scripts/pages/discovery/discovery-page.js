@@ -206,46 +206,58 @@ export default class DiscoveryPage {
   }
 
   #displayResults(compounds) {
-    const resultsContainer = document.querySelector('#results-container');
-    
-    resultsContainer.innerHTML = `
-      <div class="results-header">
-        <h2>Discovery Results</h2>
-        <p>Found ${compounds.length} candidate compounds</p>
-      </div>
-      <div class="compounds-grid">
-        ${compounds.map((compound, index) => `
-          <div class="compound-card">
-            <div class="compound-rank">#${index + 1}</div>
-            <div class="compound-structure">
-              <div class="molecule-placeholder">${compound.formula}</div>
-            </div>
-            <h3>${compound.name}</h3>
-            <div class="compound-properties">
-              <div class="property">
-                <span class="property-label">Dipole Moment (μ):</span>
-                <span class="property-value">${compound.mu.toFixed(2)}</span>
-              </div>
-              <div class="property">
-                <span class="property-label">Polarizability (α):</span>
-                <span class="property-value">${compound.alpha.toFixed(2)}</span>
-              </div>
-              <div class="property">
-                <span class="property-label">HOMO–LUMO Gap:</span>
-                <span class="property-value">${compound.gap.toFixed(2)}</span>
-              </div>
-              <div class="property">
-                <span class="property-label">Heat Capacity (Cv):</span>
-                <span class="property-value">${compound.cv.toFixed(2)}</span>
-              </div>
-            </div>
-            <div class="compound-justification">
-              <strong>AI Justification:</strong>
-              <p>${compound.justification}</p>
-            </div>
+      const resultsContainer = document.querySelector('#results-container');
+      
+      if (!compounds || compounds.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="no-results">
+            <p>No compounds found. Try adjusting your criteria.</p>
           </div>
-        `).join('')}
-      </div>
-    `;
+        `;
+        return;
+      }
+      
+      resultsContainer.innerHTML = `
+        <div class="results-header">
+          <h2>Discovery Results</h2>
+          <p>Found ${compounds.length} candidate compounds</p>
+        </div>
+        <div class="compounds-grid">
+          ${compounds.map((compound, index) => `
+            <div class="compound-card">
+              <div class="compound-rank">#${index + 1}</div>
+              <div class="compound-structure">
+                <div class="molecule-placeholder">
+                  <div class="smiles-notation">${compound.smiles || 'N/A'}</div>
+                  ${compound.num_atoms ? `<div class="atom-count">${compound.num_atoms.toFixed(0)} atoms</div>` : ''}
+                </div>
+              </div>
+              <h3>${compound.name}</h3>
+              <div class="compound-properties">
+                <div class="property">
+                  <span class="property-label">Dipole Moment (μ):</span>
+                  <span class="property-value">${compound.mu.toFixed(4)} D</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Polarizability (α):</span>
+                  <span class="property-value">${compound.alpha.toFixed(2)} Ų</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">HOMO-LUMO Gap:</span>
+                  <span class="property-value">${compound.gap.toFixed(4)} eV</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Heat Capacity (Cv):</span>
+                  <span class="property-value">${compound.cv.toFixed(2)} cal/mol·K</span>
+                </div>
+              </div>
+              <div class="compound-justification">
+                <strong>Analysis:</strong>
+                <p>${compound.justification}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
   }
 }

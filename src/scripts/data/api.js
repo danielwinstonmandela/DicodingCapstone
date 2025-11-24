@@ -1,5 +1,8 @@
 import CONFIG from '../config';
+import { mockAPIResponse } from './mockData';
 
+
+const USE_MOCK_DATA = true
 const ENDPOINTS = {
   REGISTER: `${CONFIG.BASE_URL}/register`,
   LOGIN: `${CONFIG.BASE_URL}/login`,
@@ -205,20 +208,154 @@ const JUSTIFICATIONS = [
   'This compound shows exceptional electronic properties under standard conditions with optimal heat capacity.',
 ];
 
-function generateMockCompound(index, criteria) {
-  const template = COMPOUND_TEMPLATES[index % COMPOUND_TEMPLATES.length];
-  const variance = Math.floor(Math.random() * 5) + 1;
-  
+function mapPredictionToCompound(prediction, topk, explanation, index) {
   return {
     id: `compound-${Date.now()}-${index}`,
-    name: `${template.prefix} Derivative ${index + 1}`,
-    formula: `${template.baseFormula}${5 + variance}O${variance}`,
-    mu: parseFloat((Math.random() * 4.5 + 0.5).toFixed(2)), // Dipole moment: 0.5 - 5.0
-    alpha: parseFloat((Math.random() * 40 + 50).toFixed(2)), // Polarizability: 50.0 - 90.0
-    gap: parseFloat((Math.random() * 9.9 + 0.1).toFixed(2)), // HOMO-LUMO gap: 0.1 - 10.0
-    cv: parseFloat((Math.random() * 20 + 20).toFixed(2)), // Heat capacity: 20.0 - 40.0
-    justification: JUSTIFICATIONS[Math.floor(Math.random() * JUSTIFICATIONS.length)],
+    name: topk.smiles ? `Compound ${index + 1}` : `Unknown Compound`,
+    formula: extractFormulaFromSMILES(topk.smiles), // Fungsi helper
+    smiles: topk.smiles,
+    mu: prediction.mu || 0,
+    alpha: prediction.alpha || 0,
+    gap: prediction.gap || 0,
+    cv: prediction.Cv || 0, // Perhatikan: 'Cv' bukan 'cv'
+    num_atoms: prediction.num_atoms || 0,
+    justification: explanation || 'No explanation provided',
   };
+}
+
+// api.js
+import { mockAPIResponse } from './mockData.js';
+
+// Tambahkan flag untuk testing
+
+export async function generateCompound(token, criteria) {
+  // Mode testing dengan mock data
+  if (USE_MOCK_DATA) {
+    console.log('🧪 Using mock data for testing...');
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate delay
+    
+    return processAPIResponse(mockAPIResponse, criteria);
+  }
+  
+  // Mode production dengan real API
+  try {
+    const response = await fetch(ENDPOINTS.GENERATE_COMPOUNDS, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(criteria),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return processAPIResponse(data, criteria);
+    
+  } catch (error) {
+    console.error('Error generating compounds:', error);
+    return { 
+      error: true, 
+      message: error.message,
+      compounds: [] 
+    };
+  }
+}
+
+// Helper function untuk memproses response
+function processAPIResponse(data, criteria) {
+  // Validasi data
+  if (!data.predictions || !data.topk || !data.explanations) {
+    return {
+      error: true,
+      message: 'Invalid data format',
+      compounds: []
+    };
+  }
+
+  // Map data ke format compound
+  const compounds = data.predictions.map((prediction, index) => ({
+    id: `compound-${Date.now()}-${index}`,
+    name: `Compound ${index + 1}`,
+    formula: data.topk[index]?.smiles || 'N/A',
+    smiles: data.topk[index]?.smiles || 'N/A',
+    mu: prediction.mu || 0,
+    alpha: prediction.alpha || 0,
+    gap: prediction.gap || 0,
+    cv: prediction.Cv || 0,
+    num_atoms: prediction.num_atoms || 0,
+    justification: data.explanations[index] || 'No explanation provided',
+  }));
+
+  console.log('✅ Processed compounds:', compounds);
+
+  return {
+    error: false,
+    compounds,
+    metadata: {
+      generatedAt: new Date().toISOString(),
+      criteria,
+      totalPredictions: data.predictions.length,
+    },
+  };
+}
+
+export async function generateCompounds(token, criteria) {
+  try {
+    // Ganti dengan endpoint API real Anda
+    const response = await fetch(ENDPOINTS.GENERATE_COMPOUNDS, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(criteria),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Map data dari format JSON Anda ke format compound
+    const compounds = data.predictions.map((prediction, index) => {
+      return mapPredictionToCompound(
+        prediction,
+        data.topk[index] || {},
+        data.explanations[index] || '',
+        index
+      );
+    });
+
+    // Filter hanya compounds dengan data valid (opsional)
+    const validCompounds = compounds.filter(c => c.smiles);
+
+    sendNotification('Discovery Complete! 🧬', {
+      body: `${validCompounds.length} new compounds found matching your criteria.`,
+      tag: 'discovery-complete',
+    });
+
+    return {
+      error: false,
+      compounds: validCompounds,
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        criteria,
+        totalPredictions: data.predictions.length,
+      },
+    };
+  } catch (error) {
+    console.error('Error generating compounds:', error);
+    return { 
+      error: true, 
+      message: error.message,
+      compounds: [] 
+    };
+  }
 }
 
 // Groq AI integration for generating justifications (FREE!)
