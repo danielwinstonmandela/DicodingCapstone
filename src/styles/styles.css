@@ -304,6 +304,42 @@ header {
   line-height: 1.5;
 }
 
+
+.about-us {
+  margin-top: 48px;
+  margin-bottom: 48px;
+}
+.about-us h2 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+.about-desc {
+  margin-bottom: 24px;
+  color: #aaa;
+}
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+}
+.about-card {
+  background: #181818;
+  color: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.about-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+}
+.about-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
 /* === FAQ / Accordion === */
 .faq {
   padding: 40px 0 60px;

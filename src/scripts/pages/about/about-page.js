@@ -59,6 +59,37 @@ export default class AboutPage {
             </ul>
           </section>
 
+          <section class="about-us container">
+            <h2>About Us</h2>
+            <p class="about-desc">Meet the people behind Chemical Discovery Agent:</p>
+            <div class="about-grid">
+              <div class="about-card">
+                <h3>Joseph Greffen Komala</h3>
+                <p>Lead Developer & AI Engineer</p>
+              </div>
+              <div class="about-card">
+                <h3>Joseph Greffen Komala</h3>
+                <p>UI/UX Designer</p>
+              </div>
+              <div class="about-card">
+                <h3>Joseph Greffen Komala</h3>
+                <p>Backend & API Specialist</p>
+              </div>
+              <div class="about-card">
+                <h3>Joseph Greffen Komala</h3>
+                <p>Frontend Developer</p>
+              </div>
+              <div class="about-card">
+                <h3>Joseph Greffen Komala</h3>
+                <p>Data Scientist</p>
+              </div>
+              <div class="about-card">
+                <h3>Joseph Greffen Komala</h3>
+                <p>Product Manager</p>
+              </div>
+            </div>
+          </section>
+
           <section class="about-section">
             <h2>Technology Stack</h2>
             <p>
