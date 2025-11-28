@@ -4,10 +4,12 @@ import LoginPage from '../pages/login/login-page';
 import RegisterPage from '../pages/register/register-page';
 import DiscoveryPage from '../pages/discovery/discovery-page';
 import HistoryPage from '../pages/history/history-page';
+import TutorialPage from '../pages/tutorial/tutorial-page';
 
 const routes = {
   '/': new HomePage(),
   '/about': new AboutPage(),
+  '/tutorial': new TutorialPage(),
   '/login': new LoginPage(),
   '/register': new RegisterPage(),
   '/discovery': new DiscoveryPage(),
