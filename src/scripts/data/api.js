@@ -108,7 +108,7 @@ function showCustomNotification(title, options = {}) {
   // Create notification element
   const notification = document.createElement('div');
   notification.style.cssText = `
-    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.95) 100%);
+    background: #181818;
     color: #0a0a0a;
     padding: 20px;
     border-radius: 12px;
@@ -124,7 +124,7 @@ function showCustomNotification(title, options = {}) {
     margin: 0 0 8px 0;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #0a0a0a;
+    color: #fff;
   `;
   titleElement.textContent = title;
 
@@ -132,7 +132,7 @@ function showCustomNotification(title, options = {}) {
   bodyElement.style.cssText = `
     margin: 0;
     font-size: 0.95rem;
-    color: #666;
+    color: #fff;
     line-height: 1.5;
   `;
   bodyElement.textContent = options.body || '';

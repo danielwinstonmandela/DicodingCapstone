@@ -1595,5 +1595,6 @@ select:focus {
     left: 10px !important;
     right: 10px !important;
     max-width: none !important;
+    color: black;
   }
 }
