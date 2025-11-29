@@ -70,6 +70,37 @@ export default class AboutPage {
           </section>
         </div>
       </section>
+
+        <section class="about-us container">
+          <h2>About Us</h2>
+          <p class="about-desc">Meet the people behind Chemical Discovery Agent:</p>
+          <div class="about-grid">
+            <div class="about-card">
+              <h3>Raditya Maulana Adiwicaksana</h3>
+              <p>Frontend & Backend Developer</p>
+            </div>
+            <div class="about-card">
+              <h3>Michael Satpelin Williamtu</h3>
+              <p>Frontend & Backend Developer</p>
+            </div>
+            <div class="about-card">
+              <h3>Daniel Winston Mandela Tulung</h3>
+              <p>Frontend & Backend Developer</p>
+            </div>
+            <div class="about-card">
+              <h3>Joseph Greffen Komala	</h3>
+              <p>AI Engineer</p>
+            </div>
+            <div class="about-card">
+              <h3>Hasna Mardiyahhana</h3>
+              <p>AI Engineer</p>
+            </div>
+            <div class="about-card">
+              <h3>Thoriq Dhiya Aptaribowo</h3>
+              <p>AI Engineer</p>
+            </div>
+          </div>
+        </section>
     `;
   }
 
