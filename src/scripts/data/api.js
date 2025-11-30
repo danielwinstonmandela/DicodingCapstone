@@ -3,6 +3,8 @@ import CONFIG from '../config';
 const ENDPOINTS = {
   REGISTER: `${CONFIG.BASE_URL}/register`,
   LOGIN: `${CONFIG.BASE_URL}/login`,
+  GENERATE_MOLECULE: `${CONFIG.MOLECULE_API_URL}/generate`,
+  HEALTH_CHECK: `${CONFIG.MOLECULE_API_URL}/health`,
 };
 
 // Notification helper functions
@@ -221,6 +223,65 @@ function generateMockCompound(index, criteria) {
   };
 }
 
+// Groq AI integration for generating justifications (fallback)
+async function generateJustificationWithGroq(compound, criteria) {
+  try {
+    const prompt = `You are a chemistry expert. Provide a brief 2-3 sentence scientific justification for why this chemical compound matches the given criteria.
+
+Compound: ${compound.name}
+Formula (SMILES): ${compound.formula}
+Properties:
+- Dipole Moment (μ): ${compound.mu.toFixed(2)} Debye
+- Polarizability (α): ${compound.alpha.toFixed(2)} Ų
+- HOMO-LUMO Gap: ${compound.gap.toFixed(2)} eV
+- Heat Capacity (Cv): ${compound.cv.toFixed(2)} cal/mol·K
+
+Target Criteria:
+- Target Dipole Moment (μ): ${criteria.mu} Debye
+- Target Polarizability (α): ${criteria.alpha} Ų
+- Target HOMO-LUMO Gap: ${criteria.gap} eV
+- Target Heat Capacity (Cv): ${criteria.cv} cal/mol·K
+
+Provide a concise scientific justification.`;
+
+    const response = await fetch(CONFIG.GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CONFIG.GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: CONFIG.GROQ_MODEL,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 200,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Groq API error:', errorData);
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      return data.choices[0].message.content.trim();
+    }
+    
+    return JUSTIFICATIONS[Math.floor(Math.random() * JUSTIFICATIONS.length)];
+  } catch (error) {
+    console.error('Error generating justification with Groq:', error);
+    return JUSTIFICATIONS[Math.floor(Math.random() * JUSTIFICATIONS.length)];
+  }
+}
+
 // User authentication functions (using real API)
 export async function registerUser({ name, email, password }) {
   try {
@@ -252,41 +313,158 @@ export async function loginUser({ email, password }) {
   }
 }
 
-// Chemical discovery functions (mocked for prototype)
+// Chemical discovery functions (using real HuggingFace API)
 export async function generateCompounds(token, criteria) {
-  // Simulate API delay for realistic AI processing
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  try {
+    console.log('🧪 Calling molecule generation API with criteria:', criteria);
+    console.log('⏱️ Note: Model may take several minutes, especially on first run (cold start)');
+    
+    // Call the real HuggingFace API
+    const response = await fetch(ENDPOINTS.GENERATE_MOLECULE, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        boiling_point: criteria.boilingPoint,
+        viscosity: criteria.viscosity,
+        stability: criteria.stability,
+        solubility: criteria.solubility,
+      }),
+    });
 
-  // Generate 5-8 mock compounds based on criteria
-  const count = Math.floor(Math.random() * 4) + 5;
-  const compounds = [];
-  
-  for (let i = 0; i < count; i++) {
-    compounds.push(generateMockCompound(i, criteria));
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Molecule API error:', errorText);
+      throw new Error(`API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Received molecules from API:', data);
+
+    // Transform API response to match our app's format
+    const predictions = data.predictions || [];
+    const smiles = data.topk || [];
+    const explanations = data.explanations || [];
+    
+    console.log('🔍 Predictions:', predictions.length, 'SMILES:', smiles.length, 'Explanations:', explanations.length);
+    
+    // Combine predictions with SMILES and explanations
+    const moleculeCount = Math.min(predictions.length, smiles.length);
+    const compounds = [];
+    
+    // Check if API explanations failed
+    const apiExplanationsFailed = explanations.every(exp => 
+      exp && (exp.includes('failed') || exp.includes('Error'))
+    );
+    
+    if (apiExplanationsFailed && explanations.length > 0) {
+      console.warn('⚠️ API explanations failed. Switching to Groq AI for justifications...');
+      sendNotification('Switching to Groq AI 🤖', {
+        body: 'API explanations unavailable. Using Groq AI to generate justifications.',
+        tag: 'groq-fallback',
+      });
+    }
+    
+    for (let i = 0; i < moleculeCount; i++) {
+      const pred = predictions[i];
+      const smile = smiles[i];
+      const explanation = explanations[i];
+      
+      compounds.push({
+        id: `compound-${Date.now()}-${i}`,
+        name: `Molecule ${i + 1}`,
+        formula: smile?.smiles || 'N/A',
+        mu: pred.mu || 0,
+        alpha: pred.alpha || 0,
+        gap: pred.gap || 0,
+        cv: pred.Cv || pred.cv || 0,
+        justification: null, // Will be filled below
+      });
+    }
+
+    // Generate justifications
+    if (apiExplanationsFailed || explanations.length === 0) {
+      // Use Groq AI for all justifications
+      console.log('🤖 Generating justifications with Groq AI...');
+      for (let i = 0; i < compounds.length; i++) {
+        const compound = compounds[i];
+        const justification = await generateJustificationWithGroq(compound, criteria);
+        compound.justification = justification;
+      }
+    } else {
+      // Use API explanations
+      console.log('✅ Using API explanations');
+      for (let i = 0; i < compounds.length; i++) {
+        const explanation = explanations[i];
+        if (explanation && !explanation.includes('failed') && !explanation.includes('Error')) {
+          compounds[i].justification = explanation;
+        } else {
+          // Fallback to Groq for this specific molecule
+          compounds[i].justification = await generateJustificationWithGroq(compounds[i], criteria);
+        }
+      }
+    }
+
+    const count = compounds.length;
+
+    // Send notification when discovery is complete
+    console.log('Attempting to send notification...');
+    console.log('Notification permission:', Notification.permission);
+    
+    sendNotification('Discovery Complete! 🧬', {
+      body: `${count} new compounds found matching your criteria.`,
+      tag: 'discovery-complete',
+      requireInteraction: false,
+    });
+
+    return {
+      error: false,
+      compounds,
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        criteria,
+        agentsUsed: ['Generative', 'Predictive', 'Evaluation'],
+        apiUsed: 'HuggingFace Space - dahyunn-asah',
+      },
+    };
+  } catch (error) {
+    console.error('❌ Error generating compounds:', error);
+    return {
+      error: true,
+      message: error.message,
+      compounds: [],
+    };
   }
+}
 
-  // Sort by score descending
-  compounds.sort((a, b) => b.score - a.score);
+// Health check for molecule API
+export async function checkMoleculeAPIHealth() {
+  try {
+    console.log('🏥 Checking molecule API health...');
+    const response = await fetch(ENDPOINTS.HEALTH_CHECK, {
+      method: 'GET',
+    });
 
-  // Send notification when discovery is complete
-  console.log('Attempting to send notification...');
-  console.log('Notification permission:', Notification.permission);
-  
-  sendNotification('Discovery Complete! 🧬', {
-    body: `${count} new compounds found matching your criteria.`,
-    tag: 'discovery-complete',
-    requireInteraction: false,
-  });
+    if (!response.ok) {
+      throw new Error(`Health check failed: ${response.statusText}`);
+    }
 
-  return {
-    error: false,
-    compounds,
-    metadata: {
-      generatedAt: new Date().toISOString(),
-      criteria,
-      agentsUsed: ['Generative', 'Predictive', 'Evaluation'],
-    },
-  };
+    const data = await response.json();
+    console.log('✅ API Health Check:', data);
+    return {
+      error: false,
+      status: 'healthy',
+      data,
+    };
+  } catch (error) {
+    console.error('❌ API Health Check Failed:', error);
+    return {
+      error: true,
+      status: 'unhealthy',
+      message: error.message,
+    };
+  }
 }
 
 export async function predictProperties(token, formula) {

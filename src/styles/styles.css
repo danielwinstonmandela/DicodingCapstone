@@ -898,7 +898,30 @@ select:focus {
 .compound-card h3 {
   font-size: 1.3rem;
   font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.compound-formula {
   margin-bottom: 16px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+
+.formula-label {
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 8px;
+}
+
+.smiles-code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  word-break: break-all;
 }
 
 .compound-properties {
@@ -1057,6 +1080,7 @@ select:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 10px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 6px;
@@ -1066,16 +1090,35 @@ select:focus {
 .preview-rank {
   font-weight: 800;
   color: var(--accent);
+  min-width: 30px;
+}
+
+.preview-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .preview-name {
-  flex: 1;
-  margin: 0 12px;
+  font-weight: 600;
+}
+
+.preview-smiles {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preview-score {
   font-weight: 700;
   color: var(--fg-muted);
+  min-width: 80px;
+  text-align: right;
 }
 
 .more-results {

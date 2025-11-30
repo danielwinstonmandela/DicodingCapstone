@@ -73,20 +73,20 @@ export default class HistoryPage {
             <h4>Criteria:</h4>
             <div class="criteria-grid">
               <div class="criterion">
-                <span class="criterion-label">Boiling Point:</span>
-                <span class="criterion-value">${run.criteria.boilingPoint}°C</span>
+                <span class="criterion-label">Dipole Moment (μ):</span>
+                <span class="criterion-value">${run.criteria.mu || 'N/A'} Debye</span>
               </div>
               <div class="criterion">
-                <span class="criterion-label">Viscosity:</span>
-                <span class="criterion-value">${run.criteria.viscosity} cP</span>
+                <span class="criterion-label">Polarizability (α):</span>
+                <span class="criterion-value">${run.criteria.alpha || 'N/A'} Ų</span>
               </div>
               <div class="criterion">
-                <span class="criterion-label">Stability:</span>
-                <span class="criterion-value">${run.criteria.stability}</span>
+                <span class="criterion-label">HOMO-LUMO Gap:</span>
+                <span class="criterion-value">${run.criteria.gap || 'N/A'} eV</span>
               </div>
               <div class="criterion">
-                <span class="criterion-label">Solubility:</span>
-                <span class="criterion-value">${run.criteria.solubility}</span>
+                <span class="criterion-label">Heat Capacity (Cv):</span>
+                <span class="criterion-value">${run.criteria.cv || 'N/A'} cal/mol·K</span>
               </div>
             </div>
           </div>
@@ -98,8 +98,11 @@ export default class HistoryPage {
                 ${run.results.slice(0, 3).map((compound, idx) => `
                   <div class="result-preview-item">
                     <span class="preview-rank">#${idx + 1}</span>
-                    <span class="preview-name">${compound.name}</span>
-                    <span class="preview-score">${compound.score}/100</span>
+                    <div class="preview-details">
+                      <span class="preview-name">${compound.name}</span>
+                      <code class="preview-smiles">${compound.formula || 'N/A'}</code>
+                    </div>
+                    <span class="preview-score">μ: ${compound.mu ? compound.mu.toFixed(2) : 'N/A'}</span>
                   </div>
                 `).join('')}
                 ${resultsCount > 3 ? `<p class="more-results">+${resultsCount - 3} more...</p>` : ''}
