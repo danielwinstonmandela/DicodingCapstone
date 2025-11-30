@@ -43,13 +43,13 @@ TOKENIZER_CHEMBERTA_PATH = "seyonec/ChemBERTa-zinc-base-v1"
 SCALER_FILE = "label_scaler.pkl"
 
 # Qdrant configuration - Use environment variables for security
-QDRANT_URL = os.getenv("QDRANT_URL", "https://19c476d1-a6b0-44d3-9608-2da0dc66b0ee.europe-west3-0.gcp.cloud.qdrant.io:6333")
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.bFziFuDHQQofXjWdXoa5_34g2CqDm9YIoUtmGISPMZ0")
+QDRANT_URL = os.getenv("QDRANT_URL", "QdrantURLHere")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", """QdrantAPIKeyHere""")
 QDRANT_COLLECTION = "qm9_embeddings"
 
 # LLM configuration - Use environment variables for security
 LLM_MODEL = os.getenv("LLM_MODEL", "x-ai/grok-4.1-fast")
-LLM_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+LLM_API_KEY = os.getenv("OPENROUTER_API_KEY", "OpenRouterAPIKeyHere")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
 
 # Property names for QM9 dataset
