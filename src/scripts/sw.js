@@ -2,6 +2,11 @@
 
 // Service Worker for Chemical Discovery Agent
 
+import { precacheAndRoute } from 'workbox-precaching';
+
+// Injected precache manifest will be placed here by workbox-build during injectManifest
+precacheAndRoute(self.__WB_MANIFEST || []);
+
 const CACHE_NAME = 'chemical-discovery-v1';
 const urlsToCache = [
   '/',

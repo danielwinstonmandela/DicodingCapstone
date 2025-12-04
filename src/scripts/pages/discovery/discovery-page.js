@@ -4,6 +4,8 @@ import { saveDiscoveryRun } from '../../data/idb-helper';
 export default class DiscoveryPage {
   #authToken = null;
   #userName = null;
+  #timerInterval = null;
+  #startTime = null;
 
   constructor() {
     this.#authToken = sessionStorage.getItem('authToken');
@@ -96,6 +98,10 @@ export default class DiscoveryPage {
             <div id="loading-state" class="loading-state" style="display: none;">
               <div class="spinner"></div>
               <p>AI Agents are working...</p>
+              <div class="elapsed-row" style="margin-top:8px;">
+                <span class="elapsed-label" style="font-weight:600;margin-right:6px;">Elapsed:</span>
+                <span id="elapsed-time" class="elapsed-time">00:00</span>
+              </div>
               <div class="agent-status">
                 <div class="agent-step">
                   <span class="step-icon">🧬</span>
@@ -170,6 +176,7 @@ export default class DiscoveryPage {
     
     // Show loading
     loadingState.style.display = 'block';
+    this.#startTimer();
     resultsContainer.innerHTML = '';
 
     try {
@@ -182,15 +189,19 @@ export default class DiscoveryPage {
         criteria,
         results: results.compounds,
       };
+      // stop timer and record duration
+      const duration = this.#stopTimer();
+      runData.duration = duration;
       await saveDiscoveryRun(runData);
 
       // Hide loading
       loadingState.style.display = 'none';
 
-      // Display results
-      this.#displayResults(results.compounds);
+      // Display results (include duration)
+      this.#displayResults(results.compounds, duration);
     } catch (error) {
       loadingState.style.display = 'none';
+      this.#stopTimer();
       resultsContainer.innerHTML = `
         <div class="error-state">
           <h3>Error</h3>
@@ -204,10 +215,13 @@ export default class DiscoveryPage {
   #displayResults(compounds) {
     const resultsContainer = document.querySelector('#results-container');
     
+    // second arg may be duration string
+    const duration = arguments.length > 1 ? arguments[1] : null;
+
     resultsContainer.innerHTML = `
       <div class="results-header">
         <h2>Discovery Results</h2>
-        <p>Found ${compounds.length} candidate compounds</p>
+        <p>Found ${compounds.length} candidate compounds${duration ? ` (took ${duration})` : ''}</p>
       </div>
       <div class="compounds-grid">
         ${compounds.map((compound, index) => `
@@ -243,5 +257,36 @@ export default class DiscoveryPage {
         `).join('')}
       </div>
     `;
+  }
+
+  #formatElapsed(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  #startTimer() {
+    this.#startTime = Date.now();
+    const el = document.querySelector('#elapsed-time');
+    if (el) el.textContent = '00:00';
+    this.#timerInterval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = now - this.#startTime;
+      const el2 = document.querySelector('#elapsed-time');
+      if (el2) el2.textContent = this.#formatElapsed(elapsed);
+    }, 250);
+  }
+
+  #stopTimer() {
+    if (this.#timerInterval) {
+      clearInterval(this.#timerInterval);
+      this.#timerInterval = null;
+    }
+    const elapsedMs = this.#startTime ? Date.now() - this.#startTime : 0;
+    this.#startTime = null;
+    const el = document.querySelector('#elapsed-time');
+    if (el) el.textContent = this.#formatElapsed(elapsedMs);
+    return this.#formatElapsed(elapsedMs);
   }
 }
