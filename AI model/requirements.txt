@@ -1,0 +1,11 @@
+gradio==6.0.1
+torch
+transformers
+sentencepiece
+qdrant-client
+langgraph
+langchain-openai
+huggingface_hub
+rdkit
+joblib
+scikit-learn
