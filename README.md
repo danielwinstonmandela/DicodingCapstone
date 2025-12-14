@@ -14,7 +14,7 @@ The Chemical Discovery Agent is designed to significantly accelerate R&D workflo
 
 2. **Predictive Agent** 🔬
    - Predicts properties and characteristics of each generated compound
-   - Analyzes stability, solubility, material performance, and reactivity
+   - Analyzes SMILES, Dipole Moment, Polarization, HOMO-LUMO gap, Heat capacity, and number of atoms
 
 3. **Evaluation Agent** ⚖️
    - Scores and ranks candidate compounds
@@ -25,13 +25,17 @@ The Chemical Discovery Agent is designed to significantly accelerate R&D workflo
 - **Intelligent Discovery Portal**: Define chemical criteria and generate compound candidates
 - **Comprehensive Results**: View recommended compounds with:
   - Chemical structure visualizations
-  - Predicted properties (stability, solubility, etc.)
+  - Predicted properties (SMILES, Dipole Moment, Polarization, HOMO-LUMO gap, Heat capacity)
   - AI-generated justifications
   - Synthesis complexity assessments
 - **Discovery History**: Track and review all your discovery sessions
 - **Offline Support**: Progressive Web App with offline capabilities
 - **Modern UI**: Sleek dark mode interface with smooth animations
 - **Secure Authentication**: User registration and login system
+
+### Try it yourself 
+- #### Web app: [Chemical Discovery Agent](https://chemicaldiscoveryagent.web.app/)
+- #### Documentation: [User Guide](https://drive.google.com/file/d/1O8g3Xqv-0WvGvfCA2xmg8fs3RNGU7U_z/view?usp=sharing)
 
 ## 🚀 Getting Started
 
@@ -74,7 +78,7 @@ The built files will be in the `dist` directory.
 npm run preview
 ```
 
-## 📁 Project Structure
+## 📁 Project Structure (mod this after jo add codes from ml)
 
 ```
 DicodingCapstone/
@@ -123,8 +127,8 @@ DicodingCapstone/
 - **Session Storage**: Authentication tokens
 
 ### API Integration
-- Uses Dicoding Story API for authentication
-- Mock API for compound generation (ready for real AI integration)
+- **Dicoding Story API**: Authentication
+- **Huggingface**: AI agent integration
 
 ## 🔐 Authentication
 
@@ -143,10 +147,11 @@ The app uses the Dicoding Story API for user authentication:
 
 1. **Register/Login**: Create an account or login with existing credentials
 2. **Define Criteria**: 
-   - Set boiling point range
-   - Specify viscosity requirements
-   - Choose stability level
-   - Select solubility requirements
+   - Specify the molecule Dipole Moment
+   - Specify the molecule Polarizability
+   - Specify the molecule HOMO-LUMO gap
+   - Specify the molecule Heat Capacity
+   - Set the Number of Atoms
 3. **Generate Compounds**: Click "Generate Compounds" to start AI discovery
 4. **Review Results**: 
    - View ranked compound candidates
@@ -175,6 +180,11 @@ The app is installable as a PWA with:
 - Caching strategies for fast loading
 - Mobile-responsive design
 
+## AI model
+Here is the link for our AI model files
+- #### [Google drive](https://drive.google.com/drive/folders/1lPzg6UZLQjVrnm1gU0fuBPq57JXheBzr)
+- #### [Huggingface](https://dahyunn-asah.hf.space)
+
 ## 🌟 Future Enhancements
 
 - Integration with real AI models for compound generation
@@ -188,9 +198,17 @@ The app is installable as a PWA with:
 
 This project is part of the Dicoding Capstone project.
 
-## 👥 Contributors
+## 👥 Credits
 
-- Daniel Winston Mandela
+- Front-end development:
+   - Daniel Winston Mandela
+   - Michael Satpelin Williamtu
+   - Raditya Maulana Adiwicaksana
+
+- AI development:
+   - Hasna Mardiyahhana
+   - Joseph Greffen Komala
+   - Thoriq Dhiya Aptaribowo
 
 ## 🙏 Acknowledgments
 
@@ -198,6 +216,4 @@ This project is part of the Dicoding Capstone project.
 - The open-source community for amazing tools and libraries
 
 ---
-
-**Note**: This is a prototype for demonstration purposes. The AI agents are simulated. For production use, integrate with real machine learning models and chemical informatics systems.
 DicodingCapstone
