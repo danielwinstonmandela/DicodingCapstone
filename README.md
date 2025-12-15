@@ -1,5 +1,4 @@
 # Chemical Discovery Agent
-
 A web application portal powered by Agentic AI for chemical compound discovery. Through an intuitive web interface, researchers can input desired product criteria and receive AI-generated compound recommendations.
 
 ## 🧬 Overview
@@ -78,7 +77,7 @@ The built files will be in the `dist` directory.
 npm run preview
 ```
 
-## 📁 Project Structure (mod this after jo add codes from ml)
+## 📁 Project Structure 
 
 ```
 DicodingCapstone/
