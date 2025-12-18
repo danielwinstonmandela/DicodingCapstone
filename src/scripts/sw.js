@@ -2,73 +2,25 @@
 
 // Service Worker for Chemical Discovery Agent
 
-import { precacheAndRoute } from 'workbox-precaching';
+import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching';
+import { clientsClaim } from 'workbox-core';
+import { registerRoute, NavigationRoute } from 'workbox-routing';
+
+self.skipWaiting();
+clientsClaim();
+
+cleanupOutdatedCaches();
 
 // Injected precache manifest will be placed here by workbox-build during injectManifest
 precacheAndRoute(self.__WB_MANIFEST || []);
 
-const CACHE_NAME = 'chemical-discovery-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/scripts/index.js',
-  '/styles/styles.css',
-];
-
-// Install event
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Opened cache');
-      return cache.addAll(urlsToCache);
-    })
-  );
+// Setup navigation routing to serve index.html for all navigation requests (SPA)
+const handler = createHandlerBoundToURL('/index.html');
+const navigationRoute = new NavigationRoute(handler, {
+  // allowlist: [], // by default allows all navigation requests
+  // denylist: [], // implicitly deny non-navigation
 });
-
-// Fetch event - cache-first strategy
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Cache hit - return response
-      if (response) {
-        return response;
-      }
-
-      return fetch(event.request).then((response) => {
-        // Check if valid response
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
-        }
-
-        // Clone the response
-        const responseToCache = response.clone();
-
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return response;
-      });
-    })
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-  
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});
+registerRoute(navigationRoute);
 
 // Handle messages from the main thread
 self.addEventListener('message', (event) => {

@@ -72,17 +72,4 @@ window.addEventListener('hashchange', async () => {
   await app.renderPage();
 });
 
-// Register service worker (if supported)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('./sw.js', { scope: '/' })
-      .then((registration) => {
-        console.log('SW registered:', registration);
-      })
-      .catch((error) => {
-        console.log('SW registration failed:', error);
-        // Service worker errors are non-critical, app will still work
-      });
-  });
-}
+// Service worker registration is handled automatically by vite-plugin-pwa
