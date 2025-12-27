@@ -43,19 +43,16 @@ export default class HomePage {
   }
 
   async afterRender() {
-    // Accordion functionality
     const accordionToggles = document.querySelectorAll('.accordion-toggle');
     accordionToggles.forEach((toggle) => {
       toggle.addEventListener('click', () => {
         const panel = toggle.nextElementSibling;
         const isOpen = panel.style.maxHeight;
-        
-        // Close all panels
+      
         document.querySelectorAll('.accordion-panel').forEach((p) => {
           p.style.maxHeight = null;
         });
         
-        // Open clicked panel if it was closed
         if (!isOpen) {
           panel.style.maxHeight = panel.scrollHeight + 'px';
         }
